@@ -45,8 +45,8 @@ fi
 
 git_root_dir=$(git rev-parse --show-toplevel)
 
-if [[ $(basename $git_root_dir) != "taskwarrior_syncall" ]]; then
-	echo "This isn't the taskwarrior_syncall repo -> $git_root_dir"
+if [[ $(basename $git_root_dir) != "syncall" ]]; then
+	echo "This isn't the syncall repo -> $git_root_dir"
 	exit 1
 fi
 
@@ -54,7 +54,7 @@ completions_dir="${git_root_dir}/completions"
 mkdir -p $completions_dir
 
 # main loop --------------------------------------------------------------------
-for exec in tw_gkeep_sync tw_notion_sync tw_gcal_sync tw_asana_sync; do
+for exec in tw_gkeep_sync tw_notion_sync tw_gcal_sync tw_asana_sync fs_gkeep_sync; do
 	tabs 4
 	# Run the following, grab the output and dumpt it to the completions/ files...
 	# _TW_GKEEP_SYNC_COMPLETE=fish_source tw_gkeep_sync
