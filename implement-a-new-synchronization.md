@@ -44,7 +44,7 @@ The following need to be done:
 1. Create a new Synchronization Side class for communicating with service
    `alpha` and a new synchronization Side class for communicating with service
    `beta`. If one of these sides already exists, e.g.,
-   [NotionSide](https://github.com/bergercookie/syncall/blob/master/syncall/notion_side.py),
+   [NotionSide](https://github.com/bergercookie/syncall/blob/master/syncall/notion/notion_side.py),
    you can just reuse that.
 
    This class should implement the

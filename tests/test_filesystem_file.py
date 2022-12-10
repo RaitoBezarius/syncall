@@ -1,21 +1,47 @@
 from pathlib import Path
+import pytest
 
 import xattr
 
-from syncall.filesystem_file import FilesystemFile
+from syncall.filesystem.filesystem_file import FilesystemFile
+from .conftest_helpers import fixture_true, fixture_false
 
 
-def test_fs_file_flush_attrs(python_path_with_content: Path):
+# helper fixtures -----------------------------------------------------------------------------
+@pytest.fixture
+def flush_on_instantiation(request):
+    return request.getfixturevalue(request.param)
+
+@pytest.fixture
+def fs_file_path(request):
+    return request.getfixturevalue(request.param)
+
+
+# tests ---------------------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "fs_file_path,flush_on_instantiation",
+    [("python_path_with_content", "fixture_true"), ("python_path_with_content",
+                                                                   "fixture_false")],
+    indirect=True,
+)
+def test_fs_file_flush_attrs(
+    fs_file_path: Path, flush_on_instantiation: bool
+):
     """
     Make sure that extended attributes of the FilesystemFile is only written when
     we actually .flush() it.
     """
-    p = python_path_with_content
-    fs_file = FilesystemFile(path=p)
+    p = fs_file_path
+    fs_file = FilesystemFile(path=p, flush_on_instantiation=flush_on_instantiation)
 
     x = xattr.xattr(p)
-    assert not x.list()
+
     assert fs_file.id is not None
+    if flush_on_instantiation:
+        assert x.list()
+    else:
+        assert not x.list()
 
     # flush -----------------------------------------------------------------------------------
     fs_file.flush()
@@ -57,7 +83,7 @@ def test_fs_file_flush_change_title_content(python_path_with_content: Path):
 
 
 def test_fs_file_dict_fns(non_existent_python_path: Path):
-    fs_file = FilesystemFile(path=non_existent_python_path)
+    fs_file = FilesystemFile(path=non_existent_python_path, flush_on_instantiation=False)
     assert set(("last_modified_date", "contents", "title", "id")).issubset(
         key for key in fs_file.keys()
     )

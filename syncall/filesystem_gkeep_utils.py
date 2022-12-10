@@ -4,7 +4,7 @@ from pathlib import Path
 
 from bubop.string import get_random_string
 
-from syncall.filesystem_file import FilesystemFile
+from syncall.filesystem.filesystem_file import FilesystemFile
 from syncall.google.gkeep_note import GKeepNote
 
 
@@ -35,6 +35,8 @@ def convert_gkeep_note_to_filesystem_file(
         note_title = gkeep_note.plaintext.splitlines()[0]
     else:
         note_title = get_random_string()
+
+    filename_extension = filename_extension.lstrip(".")
 
     fs = FilesystemFile(path=filesystem_root / f"{note_title}.{filename_extension}")
     fs.contents = gkeep_note.plaintext

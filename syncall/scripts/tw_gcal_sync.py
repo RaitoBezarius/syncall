@@ -139,6 +139,15 @@ def main(
         )
         sys.exit(1)
 
+    # more checks -----------------------------------------------------------------------------
+    if gcal_calendar is None:
+        logger.error(
+            "You have to provide the name of a Google Calendar calendar to synchronize events"
+            " to/from. You can do so either via CLI arguments or by specifying an existing"
+            " saved combination"
+        )
+        sys.exit(1)
+
     # announce configuration ------------------------------------------------------------------
     logger.info(
         format_dict(

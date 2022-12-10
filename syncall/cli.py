@@ -153,6 +153,7 @@ def opt_list_resolution_strategies():
         help="List all the available resolution strategies and exit",
     )
 
+
 def opt_combination(name_A: str, name_B: str):
     return click.option(
         COMBINATION_FLAGS[0],

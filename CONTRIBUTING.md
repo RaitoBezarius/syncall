@@ -53,10 +53,10 @@
   ```
 
 - If you want to test your changes during development but don't want to tamper
-  with your existing synchronizations, consider setting the
-  `TASKWARRIOR_SYNCALL_TESTENV` environment variable before execution. With
-  this variable set, `syncall` instead of `$XDG_CONFIG_HOME/syncall` will
-  instead use the `$XDG_CONFIG_HOME/test_syncall` directory.
+  with your existing synchronizations, consider setting the `SYNCALL_TESTENV`
+  environment variable before execution. With this variable set, `syncall`
+  instead of `$XDG_CONFIG_HOME/syncall,` will use the
+  `$XDG_CONFIG_HOME/test_syncall` directory.
 
 ## Git Guidelines
 

@@ -5,10 +5,10 @@ from uuid import UUID
 
 from bubop import logger, parse_datetime
 from taskw import TaskWarrior
-from taskw.fields.duration import DurationField
 from taskw.warrior import TASKRC
 
 from syncall.sync_side import ItemType, SyncSide
+from syncall.taskwarrior.taskw_duration import duration_serialize
 from syncall.types import TaskwarriorRawItem
 
 OrderByType = Literal[
@@ -141,12 +141,6 @@ class TaskWarriorSide(SyncSide):
         for i in unwanted_keys:
             t.pop(i, False)
 
-        # TODO manually convert to string here
-        duration = changes.pop(tw_duration_key)
-        if duration is not None:
-            duration_str = DurationField().serialize(duration)
-            changes[tw_duration_key] = duration_str
-
         # taskwarrior doesn't let you explicitly set the update time.
         # even if you set it it will revert to the time  that you call
         # `tw.task_update`
@@ -178,9 +172,10 @@ class TaskWarriorSide(SyncSide):
             item["project"] = self._project
 
         description = item.pop("description")
+        len_print = min(20, len(description))
+        logger.trace(f'Adding task "{description[0:len_print]}" with properties:\n\n{item}')
         new_item = self._tw.task_add(description=description, **item)  # type: ignore
         new_id = new_item["id"]
-        len_print = min(20, len(description))
         logger.debug(f'Task "{new_id}" created - "{description[0:len_print]}"...')
 
         return cast(ItemType, new_item)
@@ -213,7 +208,7 @@ class TaskWarriorSide(SyncSide):
                 "due",
                 "status",
                 "uuid",
-                "twgcalsyncduration",
+                tw_duration_key,
             ]
             if k not in ignore_keys
         ]

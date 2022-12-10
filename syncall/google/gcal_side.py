@@ -9,7 +9,6 @@ import pytz
 from bubop import format_datetime_tz, logger
 from googleapiclient import discovery
 from googleapiclient.http import HttpError
-from item_synchronizer.types import ID
 
 from syncall.google.google_side import GoogleSide
 from syncall.sync_side import SyncSide
@@ -242,16 +241,18 @@ class GCalSide(GoogleSide):
         >>> GCalSide.parse_datetime("2019-03-08T00:29:06.602Z")
         datetime.datetime(2019, 3, 8, 0, 29, 6, 602000)
 
-        >>> a = GCalSide.parse_datetime({"dateTime": "2021-11-14T22:07:49Z", "timeZone": "UTC"})
+        >>> from tzlocal import get_localzone_name
+        >>> tz = get_localzone_name()
+        >>> a = GCalSide.parse_datetime({"dateTime": "2021-11-14T22:07:49Z", "timeZone": tz})
         >>> b = GCalSide.parse_datetime({"dateTime": "2021-11-14T22:07:49.000000Z"})
         >>> b
         datetime.datetime(2021, 11, 14, 22, 7, 49)
         >>> from bubop.time import is_same_datetime
-        >>> is_same_datetime(a, b)
+        >>> is_same_datetime(a, b) or (print(a) or print(b))
         True
         >>> GCalSide.parse_datetime({"dateTime": "2021-11-14T22:07:49.123456"})
         datetime.datetime(2021, 11, 14, 22, 7, 49, 123456)
-        >>> a = GCalSide.parse_datetime({"dateTime": "2021-11-14T22:07:49Z", "timeZone": "UTC"})
+        >>> a = GCalSide.parse_datetime({"dateTime": "2021-11-14T22:07:49Z", "timeZone": tz})
         >>> GCalSide.parse_datetime(a).isoformat() == a.isoformat()
         True
         """

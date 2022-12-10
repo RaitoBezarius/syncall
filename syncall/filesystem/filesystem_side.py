@@ -5,7 +5,7 @@ from item_synchronizer.types import ID
 from loguru import logger
 
 from syncall.concrete_item import ConcreteItem
-from syncall.filesystem_file import FilesystemFile
+from syncall.filesystem.filesystem_file import FilesystemFile
 from syncall.sync_side import SyncSide
 
 

@@ -38,7 +38,8 @@ class FilesystemFile(ConcreteItem):
     _attr = "user.syncall.uuid"
     default_ext = ".txt"
 
-    def __init__(self, path: Union[str, Path], filetype=FileType.FILE):
+    def __init__(self, path: Union[str, Path], filetype=FileType.FILE,
+                 flush_on_instantiation: bool = True):
         """Create a file under the given apth and using the given contents."""
         super().__init__(
             keys=(
@@ -64,7 +65,7 @@ class FilesystemFile(ConcreteItem):
         # flags to check on exit --------------------------------------------------------------
         # If self._flush_on_instantiation then aggresively create and assign IDs to newly
         # created FilesystemFile instances
-        self._flush_on_instantiation = True
+        self._flush_on_instantiation = flush_on_instantiation
 
         self._set_id_on_flush: bool = False
         self._set_contents_on_flush: bool = False

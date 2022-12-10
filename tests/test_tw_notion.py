@@ -2,8 +2,8 @@ from typing import List
 
 import pytest
 
-from syncall.notion_side import NotionSide
-from syncall.notion_todo_block import NotionTodoBlock
+from syncall.notion.notion_side import NotionSide
+from syncall.notion.notion_todo_block import NotionTodoBlock
 from syncall.tw_notion_utils import convert_notion_to_tw, convert_tw_to_notion
 from syncall.types import NotionPageContents, NotionTodoBlockItem, TwItem, TwRawItem
 

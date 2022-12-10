@@ -1,9 +1,10 @@
+import os
 from typing import Sequence
 
 import pytest
 
-from syncall.filesystem_file import FilesystemFile
-from syncall.filesystem_side import FilesystemSide
+from syncall.filesystem.filesystem_file import FilesystemFile
+from syncall.filesystem.filesystem_side import FilesystemSide
 
 
 @pytest.mark.parametrize(
@@ -13,8 +14,13 @@ from syncall.filesystem_side import FilesystemSide
 )
 def test_create_new_item(fs_side: FilesystemSide):
     root = fs_side.filesystem_root
+    os.chdir(root)
+
+    all_items_before_addition = fs_side.get_all_items()
+    prev_len = len(all_items_before_addition)
 
     # create a new FilesystemFile
+    # By default, the item is created on disk automatically at this stage
     title = "the title"
     contents = "Kalimera!"
     new_item = FilesystemFile(path=title)
@@ -22,15 +28,8 @@ def test_create_new_item(fs_side: FilesystemSide):
     new_id = new_item.id
     assert new_id is not None
 
-    all_items_before_addition = fs_side.get_all_items()
-    prev_len = len(all_items_before_addition)
-
-    # add the item to the side, assert that the given path is written to disk on
-    # fs_side.add_item
-    item_path = root / f"{title}.txt"
-    assert not item_path.exists()
+    # add the item to the side
     fs_side.add_item(new_item)
-    assert item_path.is_file()
 
     # get the newly created item - make sure that its the same item as returned by
     # get_all_items()

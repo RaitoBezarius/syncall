@@ -5,7 +5,7 @@ from typing import cast
 from bubop import format_datetime_tz, parse_datetime
 from notion_client import Client
 
-from syncall.notion_todo_block import NotionTodoBlock
+from syncall.notion.notion_todo_block import NotionTodoBlock
 from syncall.types import NotionPage, TwItem
 
 

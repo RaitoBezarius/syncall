@@ -3,7 +3,7 @@ from typing import Dict, Optional, Sequence, cast
 from bubop import logger
 from notion_client import Client
 
-from syncall.notion_todo_block import NotionTodoBlock
+from syncall.notion.notion_todo_block import NotionTodoBlock
 from syncall.sync_side import SyncSide
 from syncall.types import NotionID, NotionPageContents, NotionTodoBlockItem
 

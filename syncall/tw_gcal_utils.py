@@ -7,13 +7,15 @@ from bubop import logger
 from item_synchronizer.types import Item
 
 from syncall.google.gcal_side import GCalSide
-from syncall.taskwarrior_side import tw_duration_key
+from syncall.taskwarrior.taskw_duration import (
+    duration_deserialize as taskw_duration_deserialize,
+    duration_serialize as taskw_duration_serialize,
+)
+from syncall.taskwarrior.taskwarrior_side import tw_duration_key
 
 _prefix_title_success_str = "✅"
 _prefix_title_failed_str = "❌"
 _failed_str = "FAIL"
-
-from taskw.fields.duration import DurationField
 
 
 def _already_has_prefix(gcal_item: Item) -> bool:
@@ -77,7 +79,7 @@ def convert_tw_to_gcal(
     # use the UDA field to fetch the duration of the event, otherwise fallback to the default
     # duration
     if tw_duration_key in tw_item.keys():
-        duration: timedelta = tw_item[tw_duration_key]
+        duration: timedelta = taskw_duration_deserialize(tw_item[tw_duration_key])
         assert isinstance(duration, timedelta)
     else:
         duration = default_event_duration
@@ -173,7 +175,7 @@ def convert_gcal_to_tw(
     if "updated" in gcal_item.keys():
         tw_item["modified"] = GCalSide.parse_datetime(gcal_item["updated"])
 
-    tw_item[tw_duration_key] = end_time - GCalSide.get_event_time(gcal_item, t="start")
+    tw_item[tw_duration_key] = taskw_duration_serialize(end_time - GCalSide.get_event_time(gcal_item, t="start"))
 
     # Note:
     # Don't add extra fields of GCal as TW annotations because then, if converted

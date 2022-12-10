@@ -43,11 +43,11 @@ from syncall.cli import (
     opt_list_combinations,
     opt_resolution_strategy,
 )
-from syncall.filesystem_gkeep_utils import (
+from syncall import (
     convert_filesystem_file_to_gkeep_note,
     convert_gkeep_note_to_filesystem_file,
 )
-from syncall.filesystem_side import FilesystemSide
+from syncall import FilesystemSide
 
 
 @click.command()
@@ -162,6 +162,13 @@ def main(
             "You have to provide at least one valid filesystem root path to use for "
             " synchronization. You can do so either via CLI arguments or by specifying an"
             " existing saved combination"
+        )
+        sys.exit(1)
+
+    if not gkeep_labels and not gkeep_ignore_labels:
+        logger.error(
+            "Refusing to run without any Google Keep labels to keep or remove - please provide"
+            " at least one of these two to continue"
         )
         sys.exit(1)
 

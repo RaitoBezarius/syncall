@@ -6,6 +6,7 @@ from typing import List
 import click
 from bubop import (
     check_optional_mutually_exclusive,
+    check_required_mutually_exclusive,
     format_dict,
     log_to_syslog,
     logger,
@@ -132,6 +133,14 @@ def main(
             " the synchronization"
         )
 
+    # more checks -----------------------------------------------------------------------------
+    if notion_page_id is None:
+        logger.error(
+            "You have to provide the page ID of the Notion page for synchronization. You can"
+            " do so either via CLI arguments or by specifying an existing saved combination"
+        )
+        sys.exit(1)
+
     # announce configuration ------------------------------------------------------------------
     logger.info(
         format_dict(
@@ -147,10 +156,18 @@ def main(
     )
 
     # find token to connect to notion ---------------------------------------------------------
-    token_v2 = os.environ.get("NOTION_API_KEY")
+    api_key_env_var = "NOTION_API_KEY"
+    token_v2 = os.environ.get(api_key_env_var)
     if token_v2 is not None:
         logger.debug("Reading the Notion API key from environment variable...")
     else:
+        if token_pass_path is None:
+            logger.error(
+                "You have to provide the Notion API key, either via the"
+                f" {api_key_env_var} environment variable or via the UNIX Passowrdr Manager"
+                ' and the "--token-pass-path" CLI parameter'
+            )
+            sys.exit(1)
         token_v2 = fetch_from_pass_manager(token_pass_path)
 
     assert token_v2

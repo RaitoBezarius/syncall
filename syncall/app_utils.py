@@ -66,7 +66,7 @@ def app_name():
     Return the name of the application which defines the config, cache, and share directories
     of this app.
     """
-    if "TASKWARRIOR_SYNCALL_TESTENV" in os.environ:
+    if "SYNCALL_TESTENV" in os.environ:
         return "test_syncall"
     else:
         return "syncall"

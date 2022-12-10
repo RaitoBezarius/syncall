@@ -3,7 +3,7 @@ import datetime
 from dateutil.tz import tzutc
 
 from syncall.concrete_item import ItemKey, KeyType
-from syncall.notion_todo_block import NotionTodoBlock
+from syncall.notion.notion_todo_block import NotionTodoBlock
 from syncall.types import NotionTodoBlockItem
 
 simple_last_modified_date = datetime.datetime(2021, 12, 4, 10, 1, tzinfo=tzutc())

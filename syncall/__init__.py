@@ -92,7 +92,7 @@ except ImportError:
 
 # tw ------------------------------------------------------------------------------------------
 try:
-    from syncall.taskwarrior_side import TaskWarriorSide
+    from syncall.taskwarrior.taskwarrior_side import TaskWarriorSide
 
     __all__.extend(
         [
@@ -104,7 +104,7 @@ except ImportError:
 
 # notion --------------------------------------------------------------------------------------
 try:
-    from syncall.notion_side import NotionSide
+    from syncall.notion.notion_side import NotionSide
 
     __all__.extend(["NotionSide"])
 except ImportError:
@@ -137,7 +137,6 @@ try:
     from syncall.google.gkeep_note_side import GKeepNoteSide
     from syncall.google.gkeep_todo_item import GKeepTodoItem
     from syncall.google.gkeep_todo_side import GKeepTodoSide
-    from syncall.tw_gkeep_utils import convert_gkeep_todo_to_tw, convert_tw_to_gkeep_todo
 
     __all__.extend(
         [
@@ -148,6 +147,42 @@ try:
             "convert_gkeep_todo_to_tw",
             "convert_tw_to_gkeep_todo",
         ]
+    )
+except ImportError:
+    pass
+
+# gkeep <> tw
+try:
+    from syncall.tw_gkeep_utils import convert_gkeep_todo_to_tw, convert_tw_to_gkeep_todo
+
+    __all__.extend(
+        [
+            "convert_gkeep_todo_to_tw",
+            "convert_tw_to_gkeep_todo",
+        ]
+    )
+except ImportError:
+    pass
+
+# filesytem -----------------------------------------------------------------------------------
+try:
+    from syncall.filesystem.filesystem_file import FilesystemFile
+    from syncall.filesystem.filesystem_side import FilesystemSide
+
+    __all__.extend(["FilesystemFile", "FilesystemSide"])
+except ImportError:
+    pass
+
+
+# filesytem <> gkeep --------------------------------------------------------------------------
+try:
+    from syncall.filesystem_gkeep_utils import (
+        convert_filesystem_file_to_gkeep_note,
+        convert_gkeep_note_to_filesystem_file,
+    )
+
+    __all__.extend(
+        ["convert_filesystem_file_to_gkeep_note", "convert_gkeep_note_to_filesystem_file"]
     )
 except ImportError:
     pass
