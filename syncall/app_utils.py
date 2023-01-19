@@ -11,7 +11,7 @@ import sys
 from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping, NoReturn, Optional, Sequence, Type, cast
+from typing import Any, Mapping, NoReturn, Optional, Sequence, Tuple, Type, cast
 from urllib.parse import quote
 
 from bubop import PrefsManager, format_list, logger, non_empty, read_gpg_token, valid_path
@@ -230,6 +230,12 @@ def inform_about_app_extras(extras: Sequence[str]) -> NoReturn:
     sys.exit(1)
 
 
+def error_and_exit(msg: str) -> NoReturn:
+    """Shortcut to log an error using logger.error, then exit the application."""
+    logger.error(msg)
+    sys.exit(1)
+
+
 def write_to_pass_manager(password_path: str, passwd: str) -> None:
     """Write a new password to the designated location."""
     pass_dir = valid_path(os.environ.get("PASSWORD_STORE_DIR", "~/.password-store"))
@@ -289,3 +295,39 @@ def fetch_from_pass_manager(password_path: str, allow_fail=False) -> Optional[st
             sys.exit(1)
 
     return passwd
+
+
+def gkeep_read_username_password_token(
+    gkeep_user_pass_path: str, gkeep_passwd_pass_path: str, gkeep_token_pass_path: str
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Helper method for reading the username, password and application token for applications
+    that connect to Google Keep using the gkeepapi python module.
+
+    For all three of the variables above, it will first try reading them from environment
+    variables, then if empty will resort to reading them from the UNIX Password manager.
+    """
+    # fetch username
+    gkeep_user = os.environ.get("GKEEP_USERNAME")
+    if gkeep_user is not None:
+        logger.debug("Reading the gkeep username from environment variable...")
+    else:
+        gkeep_user = fetch_from_pass_manager(gkeep_user_pass_path)
+    assert gkeep_user
+
+    # fetch password
+    gkeep_passwd = os.environ.get("GKEEP_PASSWD")
+    if gkeep_passwd is not None:
+        logger.debug("Reading the gkeep password from environment variable...")
+    else:
+        gkeep_passwd = fetch_from_pass_manager(gkeep_passwd_pass_path)
+    assert gkeep_passwd
+
+    # fetch gkeep token
+    gkeep_token = os.environ.get("GKEEP_TOKEN")
+    if gkeep_token is not None:
+        logger.debug("Reading the gkeep token from environment variable...")
+    else:
+        gkeep_token = fetch_from_pass_manager(gkeep_token_pass_path, allow_fail=True)
+
+    return gkeep_user, gkeep_passwd, gkeep_token

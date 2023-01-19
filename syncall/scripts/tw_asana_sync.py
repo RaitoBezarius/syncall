@@ -14,6 +14,7 @@ from bubop import (
 )
 
 from syncall import inform_about_app_extras
+from syncall.app_utils import error_and_exit
 
 try:
     from syncall import AsanaSide
@@ -96,7 +97,12 @@ def main(
     # find token to connect to asana ---------------------------------------------------------
     token = os.environ.get("ASANA_PERSONAL_ACCESS_TOKEN")
     if token is None and token_pass_path is None:
-        raise RuntimeError("You must provide an Asana Personal Access Token.")
+        # TODO Re-write this.
+        # Hacky way of accessing the parameter naem for the token pass path.
+        name = opt_asana_token_pass_path()(lambda: None).__click_params__[0].opts[-1]
+        error_and_exit(
+            f"You must provide an Asana Personal Access Token, using the {name} flag"
+        )
     if token is not None:
         logger.debug(
             "Reading the Asana Personal Access Token (PAT) from environment variable..."
@@ -137,10 +143,10 @@ def main(
     # --list-asana-workspaces or if --asana-task-gid was not specified.
     if asana_task_gid is None and not do_list_asana_workspaces:
         if asana_workspace_gid is None and asana_workspace_name is None:
-            raise RuntimeError("Provide either an Asana workspace name or GID to sync.")
+            error_and_exit("Provide either an Asana workspace name or GID to sync.")
 
         if asana_workspace_gid is not None and asana_workspace_name is not None:
-            raise RuntimeError("Provide either Asana workspace GID or name, but not both.")
+            error_and_exit("Provide either Asana workspace GID or name, but not both.")
 
         found_workspace = False
 
@@ -151,7 +157,7 @@ def main(
                 break
             if workspace["name"] == asana_workspace_name:
                 if found_workspace:
-                    raise RuntimeError(
+                    error_and_exit(
                         "Found multiple workspaces with the provided name. Please specify"
                         " workspace GID instead."
                     )
@@ -161,11 +167,11 @@ def main(
 
         if not found_workspace:
             if asana_workspace_gid:
-                raise RuntimeError(
+                error_and_exit(
                     "No Asana workspace was found with a GID matching the one provided."
                 )
             if asana_workspace_name:
-                raise RuntimeError(
+                error_and_exit(
                     "No Asana workspace was found with a name matching the one provided."
                 )
 
@@ -187,7 +193,7 @@ def main(
 
     # at least one of tw_tags, tw_project should be set ---------------------------------------
     if not do_list_asana_workspaces and not tw_tags and not tw_project:
-        raise RuntimeError(
+        error_and_exit(
             "You have to provide at least one valid tag or a valid project ID to use for"
             " the synchronization"
         )

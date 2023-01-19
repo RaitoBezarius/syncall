@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import Sequence
 
@@ -12,6 +11,7 @@ from bubop import (
 )
 
 from syncall import inform_about_app_extras
+from syncall.app_utils import gkeep_read_username_password_token, write_to_pass_manager
 
 try:
     from syncall import GKeepTodoSide
@@ -26,7 +26,6 @@ from syncall import (
     convert_gkeep_todo_to_tw,
     convert_tw_to_gkeep_todo,
     fetch_app_configuration,
-    fetch_from_pass_manager,
     get_resolution_strategy,
     inform_about_combination_name_usage,
     list_named_combinations,
@@ -37,6 +36,7 @@ from syncall.cli import (
     opt_custom_combination_savename,
     opt_gkeep_note,
     opt_gkeep_passwd_pass_path,
+    opt_gkeep_token_pass_path,
     opt_gkeep_user_pass_path,
     opt_list_combinations,
     opt_resolution_strategy,
@@ -50,6 +50,7 @@ from syncall.cli import (
 @opt_gkeep_note()
 @opt_gkeep_user_pass_path()
 @opt_gkeep_passwd_pass_path()
+@opt_gkeep_token_pass_path()
 # taskwarrior options -------------------------------------------------------------------------
 @opt_tw_tags()
 @opt_tw_project()
@@ -64,6 +65,7 @@ def main(
     gkeep_note: str,
     gkeep_user_pass_path: str,
     gkeep_passwd_pass_path: str,
+    gkeep_token_pass_path: str,
     tw_tags: Sequence[str],
     tw_project: str,
     resolution_strategy: str,
@@ -152,27 +154,18 @@ def main(
     )
 
     # initialize sides ------------------------------------------------------------------------
-    # fetch username
-    gkeep_user = os.environ.get("GKEEP_USERNAME")
-    if gkeep_user is not None:
-        logger.debug("Reading the gkeep username from environment variable...")
-    else:
-        gkeep_user = fetch_from_pass_manager(gkeep_user_pass_path)
-    assert gkeep_user
-
-    # fetch password
-    gkeep_passwd = os.environ.get("GKEEP_PASSWD")
-    if gkeep_passwd is not None:
-        logger.debug("Reading the gkeep password from environment variable...")
-    else:
-        gkeep_passwd = fetch_from_pass_manager(gkeep_passwd_pass_path)
-    assert gkeep_passwd
+    gkeep_user, gkeep_passwd, gkeep_token = gkeep_read_username_password_token(
+        gkeep_user_pass_path,
+        gkeep_passwd_pass_path,
+        gkeep_token_pass_path,
+    )
 
     # initialize google keep  -----------------------------------------------------------------
     gkeep_side = GKeepTodoSide(
         note_title=gkeep_note,
         gkeep_user=gkeep_user,
         gkeep_passwd=gkeep_passwd,
+        gkeep_token=gkeep_token,
         notes_label="tw_gkeep_sync",
     )
 
@@ -202,6 +195,12 @@ def main(
     except:
         report_toplevel_exception(is_verbose=verbose >= 1)
         return 1
+
+    # cache the token
+    token = gkeep_side.get_master_token()
+    if token is not None:
+        logger.debug(f"Caching the gkeep token in pass -> {gkeep_token_pass_path}...")
+        write_to_pass_manager(password_path=gkeep_token_pass_path, passwd=token)
 
     if inform_about_config:
         inform_about_combination_name_usage(combination_name)

@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 from typing import Optional, Sequence
@@ -22,16 +21,18 @@ except ImportError:
 
 from syncall import (
     Aggregator,
+    FilesystemSide,
     __version__,
     cache_or_reuse_cached_combination,
+    convert_filesystem_file_to_gkeep_note,
+    convert_gkeep_note_to_filesystem_file,
     fetch_app_configuration,
-    fetch_from_pass_manager,
     get_resolution_strategy,
     inform_about_combination_name_usage,
     list_named_combinations,
     report_toplevel_exception,
 )
-from syncall.app_utils import write_to_pass_manager
+from syncall.app_utils import gkeep_read_username_password_token, write_to_pass_manager
 from syncall.cli import (
     opt_combination,
     opt_custom_combination_savename,
@@ -43,11 +44,6 @@ from syncall.cli import (
     opt_list_combinations,
     opt_resolution_strategy,
 )
-from syncall import (
-    convert_filesystem_file_to_gkeep_note,
-    convert_gkeep_note_to_filesystem_file,
-)
-from syncall import FilesystemSide
 
 
 @click.command()
@@ -188,28 +184,11 @@ def main(
     )
 
     # initialize sides ------------------------------------------------------------------------
-    # fetch username
-    gkeep_user = os.environ.get("GKEEP_USERNAME")
-    if gkeep_user is not None:
-        logger.debug("Reading the gkeep username from environment...")
-    else:
-        gkeep_user = fetch_from_pass_manager(gkeep_user_pass_path)
-    assert gkeep_user
-
-    # fetch password
-    gkeep_passwd = os.environ.get("GKEEP_PASSWD")
-    if gkeep_passwd is not None:
-        logger.debug("Reading the gkeep password from environment...")
-    else:
-        gkeep_passwd = fetch_from_pass_manager(gkeep_passwd_pass_path)
-    assert gkeep_passwd
-
-    # fetch gkeep token
-    gkeep_token = os.environ.get("GKEEP_TOKEN")
-    if gkeep_token is not None:
-        logger.debug("Reading the gkeep token from environment...")
-    else:
-        gkeep_token = fetch_from_pass_manager(gkeep_token_pass_path, allow_fail=True)
+    gkeep_user, gkeep_passwd, gkeep_token = gkeep_read_username_password_token(
+        gkeep_user_pass_path,
+        gkeep_passwd_pass_path,
+        gkeep_token_pass_path,
+    )
 
     # initialize google keep  -----------------------------------------------------------------
     gkeep_side = GKeepNoteSide(

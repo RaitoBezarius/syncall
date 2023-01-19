@@ -177,6 +177,6 @@ class GKeepTodoSide(GKeepSide):
     def items_are_identical(
         cls, item1: GKeepTodoItem, item2: GKeepTodoItem, ignore_keys: Sequence[str] = []
     ) -> bool:
-        ignore_keys_ = ["last_edited_time"]
+        ignore_keys_ = [cls.last_modification_key()]
         ignore_keys_.extend(ignore_keys)
         return item1.compare(item2, ignore_keys=ignore_keys_)

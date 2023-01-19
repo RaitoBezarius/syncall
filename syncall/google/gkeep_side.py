@@ -13,7 +13,11 @@ from syncall.sync_side import SyncSide
 
 class GKeepSide(SyncSide):
     def __init__(
-        self, gkeep_user: str, gkeep_passwd: Optional[str], gkeep_token: Optional[str], **kargs
+        self,
+        gkeep_user: str,
+        gkeep_passwd: Optional[str] = None,
+        gkeep_token: Optional[str] = None,
+        **kargs,
     ):
         self._keep: Keep
         self._gkeep_user = gkeep_user
@@ -38,6 +42,7 @@ class GKeepSide(SyncSide):
             self._keep.resume(self._gkeep_user, self._gkeep_token, state=None, sync=True)
             logger.info("Logged in using token")
         except LoginException:
+            # We have a token and we couldn't log in using this token, thus it's invalid.
             if self._gkeep_token is not None:
                 logger.debug("Invalid token, attempting login via username/password...")
             self._keep.login(self._gkeep_user, self._gkeep_passwd)
