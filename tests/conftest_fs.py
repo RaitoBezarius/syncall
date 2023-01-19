@@ -6,7 +6,6 @@ from syncall.filesystem.filesystem_file import FilesystemFile
 from syncall.filesystem.filesystem_side import FilesystemSide
 
 
-
 @pytest.fixture
 def fs_side(request: pytest.FixtureRequest) -> dict:
     """Fixture to parametrize on."""
@@ -23,9 +22,11 @@ def fs_file_default_fname() -> str:
 def fs_file_default_name() -> str:
     return "file"
 
+
 @pytest.fixture
 def tmpdir_path(tmpdir) -> Path:
     return Path(tmpdir)
+
 
 @pytest.fixture
 def non_existent_python_path(tmpdir_path, fs_file_default_fname) -> Path:

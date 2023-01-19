@@ -38,8 +38,12 @@ class FilesystemFile(ConcreteItem):
     _attr = "user.syncall.uuid"
     default_ext = ".txt"
 
-    def __init__(self, path: Union[str, Path], filetype=FileType.FILE,
-                 flush_on_instantiation: bool = True):
+    def __init__(
+        self,
+        path: Union[str, Path],
+        filetype=FileType.FILE,
+        flush_on_instantiation: bool = True,
+    ):
         """Create a file under the given apth and using the given contents."""
         super().__init__(
             keys=(

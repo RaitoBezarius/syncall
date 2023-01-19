@@ -1,16 +1,18 @@
 from pathlib import Path
-import pytest
 
+import pytest
 import xattr
 
 from syncall.filesystem.filesystem_file import FilesystemFile
-from .conftest_helpers import fixture_true, fixture_false
+
+from .conftest_helpers import fixture_false, fixture_true
 
 
 # helper fixtures -----------------------------------------------------------------------------
 @pytest.fixture
 def flush_on_instantiation(request):
     return request.getfixturevalue(request.param)
+
 
 @pytest.fixture
 def fs_file_path(request):
@@ -19,15 +21,16 @@ def fs_file_path(request):
 
 # tests ---------------------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize(
     "fs_file_path,flush_on_instantiation",
-    [("python_path_with_content", "fixture_true"), ("python_path_with_content",
-                                                                   "fixture_false")],
+    [
+        ("python_path_with_content", "fixture_true"),
+        ("python_path_with_content", "fixture_false"),
+    ],
     indirect=True,
 )
-def test_fs_file_flush_attrs(
-    fs_file_path: Path, flush_on_instantiation: bool
-):
+def test_fs_file_flush_attrs(fs_file_path: Path, flush_on_instantiation: bool):
     """
     Make sure that extended attributes of the FilesystemFile is only written when
     we actually .flush() it.
