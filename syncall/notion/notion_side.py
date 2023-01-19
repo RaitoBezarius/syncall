@@ -126,7 +126,7 @@ class NotionSide(SyncSide):
     def items_are_identical(
         cls, item1: NotionTodoBlock, item2: NotionTodoBlock, ignore_keys: Sequence[str] = []
     ) -> bool:
-        ignore_keys_ = ["last_edited_time"]
+        ignore_keys_ = ["last_modified_date"]
         ignore_keys_.extend(ignore_keys)
         return item1.compare(item2, ignore_keys=ignore_keys_)
 
