@@ -11,6 +11,8 @@ from bubop import (
     loguru_tqdm_sink,
 )
 
+from syncall.app_utils import error_and_exit
+
 try:
     from syncall import CaldavSide, TaskWarriorSide
 except ImportError:
@@ -122,7 +124,7 @@ def main(
 
     # at least one of tw_tags, tw_project should be set ---------------------------------------
     if not tw_tags and not tw_project:
-        raise RuntimeError(
+        error_and_exit(
             "You have to provide at least one valid tag or a valid project ID to use for"
             " the synchronization"
         )
@@ -147,7 +149,7 @@ def main(
     if not caldav_url or not caldav_calendar:
         logger.debug(caldav_url)
         logger.debug(caldav_calendar)
-        raise RuntimeError(
+        error_and_exit(
             "You must provide a URL and calendar in order to synchronize via caldav"
         )
 
@@ -155,8 +157,7 @@ def main(
     if not caldav_user:
         caldav_user = os.environ.get("CALDAV_USERNAME")
     if caldav_user is None:
-        raise RuntimeError("You must provide a username in order to synchronize via caldav")
-    assert caldav_user
+        error_and_exit("You must provide a username in order to synchronize via caldav")
 
     # fetch password
     caldav_passwd = os.environ.get("CALDAV_PASSWD")
@@ -164,7 +165,6 @@ def main(
         logger.debug("Reading the caldav password from environment variable...")
     else:
         caldav_passwd = fetch_from_pass_manager(caldav_passwd_pass_path)
-    assert caldav_passwd
 
     client = caldav.DAVClient(url=caldav_url, username=caldav_user, password=caldav_passwd)
     caldav_side = CaldavSide(client=client, calendar_name=caldav_calendar)

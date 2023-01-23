@@ -5,6 +5,7 @@ from bubop import logger
 from icalendar.prop import vCategory, vDatetime, vText
 from item_synchronizer.types import ID
 
+from syncall.app_utils import error_and_exit
 from syncall.sync_side import SyncSide
 from syncall.tw_caldav_utils import map_ics_to_item
 
@@ -46,7 +47,7 @@ class CaldavSide(SyncSide):
             logger.debug(f"Connected to calendar {calendar.name}")
             acceptable_component_types = calendar.get_supported_components()
             if "VTODO" not in acceptable_component_types:
-                raise RuntimeError(
+                error_and_exit(
                     f"Calendar {self._calendar_name} found but does not support VTODO entries"
                     " - please choose a different calendar"
                 )
