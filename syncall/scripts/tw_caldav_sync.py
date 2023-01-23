@@ -11,6 +11,7 @@ from bubop import (
     loguru_tqdm_sink,
 )
 
+from syncall import inform_about_app_extras
 from syncall.app_utils import error_and_exit
 
 try:
@@ -27,7 +28,6 @@ from syncall import (
     fetch_app_configuration,
     fetch_from_pass_manager,
     get_resolution_strategy,
-    inform_about_app_extras,
     inform_about_combination_name_usage,
     list_named_combinations,
     opt_caldav_calendar,
