@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 import caldav
 import click
@@ -13,9 +13,17 @@ from bubop import (
 
 from syncall import inform_about_app_extras
 from syncall.app_utils import error_and_exit
+from syncall.cli import (
+    opt_caldav_calendar,
+    opt_caldav_passwd_pass_path,
+    opt_caldav_url,
+    opt_caldav_user,
+)
+from syncall.tw_caldav_utils import convert_caldav_to_tw, convert_tw_to_caldav
 
 try:
-    from syncall import CaldavSide, TaskWarriorSide
+    from syncall.caldav.caldav_side import CaldavSide
+    from syncall.taskwarrior.taskwarrior_side import TaskWarriorSide
 except ImportError:
     inform_about_app_extras(["caldav", "tw"])
 
@@ -23,17 +31,11 @@ from syncall import (
     Aggregator,
     __version__,
     cache_or_reuse_cached_combination,
-    convert_caldav_to_tw,
-    convert_tw_to_caldav,
     fetch_app_configuration,
     fetch_from_pass_manager,
     get_resolution_strategy,
     inform_about_combination_name_usage,
     list_named_combinations,
-    opt_caldav_calendar,
-    opt_caldav_passwd_pass_path,
-    opt_caldav_url,
-    opt_caldav_user,
     opt_combination,
     opt_custom_combination_savename,
     opt_list_combinations,
@@ -63,7 +65,7 @@ from syncall import (
 def main(
     caldav_calendar: str,
     caldav_url: str,
-    caldav_user: str,
+    caldav_user: Optional[str],
     caldav_passwd_pass_path: str,
     tw_tags: List[str],
     tw_project: str,
@@ -76,7 +78,8 @@ def main(
     """Synchronize calendars from your caldav Calendar with filters from Taskwarrior.
 
     The list of TW tasks is determined by a combination of TW tags and a TW project.
-    The calendar in Caldav should be provided by their name. if it doesn't exist it will be created
+    The calendar in Caldav should be provided by their name. If it doesn't exist it will be
+    created
     """
 
     loguru_tqdm_sink(verbosity=verbose)
@@ -157,7 +160,9 @@ def main(
     if not caldav_user:
         caldav_user = os.environ.get("CALDAV_USERNAME")
     if caldav_user is None:
-        error_and_exit("You must provide a username in order to synchronize via caldav")
+        error_and_exit(
+            "You must provide a username in order to synchronize via caldav, either "
+        )
 
     # fetch password
     caldav_passwd = os.environ.get("CALDAV_PASSWD")
@@ -182,7 +187,7 @@ def main(
             config_fname=combination_name,
             ignore_keys=(
                 (),
-                ("due", "end", "entry", "modified", "urgency"),
+                (),
             ),
         ) as aggregator:
             aggregator.sync()
